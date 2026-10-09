@@ -122,3 +122,89 @@ html.dark body { background-color: #0d1b17; background-image: radial-gradient(el
 .feature-tabs { scrollbar-width: thin; scrollbar-color: #91edb3 transparent; }
 .feature-tabs [role="tab"] { min-height: 2.75rem; }
 @media (max-width: 640px) { .feature-tabs { margin-inline: -0.25rem; padding-bottom: .55rem; border-radius: 1rem; } }
+
+/* Readability pass: bring small utility text up to comfortable reading sizes. */
+body { font-size: 17px; line-height: 1.6; }
+.text-xs { font-size: .9375rem; line-height: 1.45rem; }
+.text-sm { font-size: 1.0625rem; line-height: 1.65rem; }
+.text-base { font-size: 1.1875rem; line-height: 1.8rem; }
+[class~="text-[10px]"] { font-size: .8125rem; line-height: 1.15rem; }
+[class~="text-[11px]"] { font-size: .875rem; line-height: 1.25rem; }
+
+/* Colorful ambient lighting adds depth while the solid strokes keep edges crisp. */
+body {
+  background-image:
+    radial-gradient(ellipse at 92% 7%, rgba(255, 142, 214, .17), transparent 30%),
+    radial-gradient(ellipse at 5% 42%, rgba(54, 213, 245, .15), transparent 32%),
+    radial-gradient(ellipse at 50% -20%, rgba(196, 247, 210, .7), transparent 55%);
+}
+html.dark body {
+  background-image:
+    radial-gradient(ellipse at 94% 8%, rgba(175, 54, 150, .16), transparent 32%),
+    radial-gradient(ellipse at 4% 42%, rgba(17, 150, 181, .15), transparent 34%),
+    radial-gradient(ellipse at 50% -25%, rgba(21, 93, 59, .45), transparent 55%);
+}
+.welcome-card {
+  border: 1px solid rgba(177, 255, 201, .68);
+  background: linear-gradient(122deg, #064e3b 0%, #087f5b 42%, #16a765 72%, #20b979 100%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.22), 0 2px 0 #075e46, 0 18px 42px rgba(7, 94, 70, .25);
+  transform: perspective(1200px) rotateX(.35deg);
+}
+.welcome-orb {
+  background: radial-gradient(circle at 35% 65%, rgba(255, 246, 159, .7), rgba(69, 238, 175, .3) 48%, rgba(80, 210, 246, .12) 64%, transparent 74%);
+}
+main section[aria-labelledby] {
+  border-width: 1.5px;
+  border-color: #a9dcbc;
+  background-clip: padding-box;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.9), 0 2px 0 rgba(53, 127, 77, .14), 0 10px 24px rgba(20, 80, 44, .08);
+  transform: perspective(1100px) translateZ(0);
+}
+main section[aria-labelledby]:hover {
+  border-color: #71ca91;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.95), 0 3px 0 rgba(53, 127, 77, .18), 0 18px 32px rgba(20, 80, 44, .14);
+  transform: perspective(1100px) translateY(-3px) rotateX(.25deg);
+}
+html.dark main section[aria-labelledby] {
+  border-color: #276347;
+  box-shadow: inset 0 1px 0 rgba(220,255,232,.06), 0 2px 0 rgba(0,0,0,.4), 0 12px 28px rgba(0,0,0,.28);
+}
+html.dark main section[aria-labelledby]:hover {
+  border-color: #3b9b63;
+  box-shadow: inset 0 1px 0 rgba(220,255,232,.1), 0 3px 0 rgba(0,0,0,.45), 0 18px 34px rgba(0,0,0,.36);
+}
+.feature-tabs {
+  border-width: 1.5px;
+  border-color: #a4dbb8;
+  box-shadow: inset 0 1px 0 #fff, 0 3px 0 rgba(34, 116, 67, .13), 0 12px 26px rgba(12,80,46,.11);
+  perspective: 1000px;
+}
+.feature-tabs [role="tab"] {
+  font-size: 1.0625rem;
+  line-height: 1.5rem;
+  transition: transform .2s ease, box-shadow .2s ease, background-color .2s ease;
+}
+.feature-tabs [role="tab"][aria-selected="true"] {
+  background: linear-gradient(135deg, #087f5b 0%, #17b66b 54%, #32cf77 100%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 3px 0 #076542, 0 7px 14px rgba(8,127,91,.24);
+  transform: translateY(-2px) rotateX(2deg);
+}
+.feature-tabs [role="tab"]:not([aria-selected="true"]):hover { transform: translateY(-1px); }
+main [role="tabpanel"] li {
+  border-width: 1.5px;
+  border-color: #c3dfca;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.9), 0 2px 0 rgba(35,92,54,.12), 0 7px 17px rgba(23,81,43,.07);
+  transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+main [role="tabpanel"] li:hover {
+  border-color: #75c98f;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.95), 0 3px 0 rgba(35,92,54,.16), 0 13px 24px rgba(23,81,43,.12);
+  transform: perspective(900px) translateY(-2px) rotateX(.2deg);
+}
+html.dark .feature-tabs { border-color: #285e40; box-shadow: inset 0 1px 0 rgba(220,255,232,.08), 0 3px 0 rgba(0,0,0,.4), 0 12px 28px rgba(0,0,0,.3); }
+html.dark main [role="tabpanel"] li { border-color: #315742; box-shadow: inset 0 1px 0 rgba(220,255,232,.06), 0 2px 0 rgba(0,0,0,.35), 0 8px 20px rgba(0,0,0,.2); }
+html.dark main [role="tabpanel"] li:hover { border-color: #4b9b68; }
+@media (max-width: 640px) {
+  body { font-size: 16px; }
+  .welcome-card { transform: none; }
+}
