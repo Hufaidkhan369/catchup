@@ -11,6 +11,12 @@ interface SummaryCardProps {
 
 export function SummaryCard({ result, onExportMarkdown, onExportText, onCopy }: SummaryCardProps) {
   const [copied, setCopied] = useState(false);
+  const reviewItems = [...result.actions, ...result.decisions, ...result.announcements, ...result.mentions];
+  const priorityCounts = {
+    high: reviewItems.filter((item) => item.priority === "high").length,
+    medium: reviewItems.filter((item) => item.priority === "medium").length,
+    low: reviewItems.filter((item) => item.priority === "low").length,
+  };
 
   const handleCopy = async () => {
     onCopy();
@@ -34,6 +40,27 @@ export function SummaryCard({ result, onExportMarkdown, onExportText, onCopy }: 
       </div>
 
       <p className="text-sm leading-relaxed text-slate-800 dark:text-slate-200">{result.tldr}</p>
+
+      <div className="mt-5">
+        <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+          Important to review
+        </h3>
+        <div className="grid grid-cols-3 gap-2" role="group" aria-label="Priority overview">
+          <div className="rounded-xl border border-rose-200 bg-rose-50/80 p-3 dark:border-rose-900/70 dark:bg-rose-950/30">
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-rose-700 dark:text-rose-300">High</p>
+            <p className="mt-1 text-2xl font-bold leading-none text-rose-800 dark:text-rose-200">{priorityCounts.high}</p>
+          </div>
+          <div className="rounded-xl border border-amber-200 bg-amber-50/80 p-3 dark:border-amber-900/70 dark:bg-amber-950/30">
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-300">Medium</p>
+            <p className="mt-1 text-2xl font-bold leading-none text-amber-800 dark:text-amber-200">{priorityCounts.medium}</p>
+          </div>
+          <div className="rounded-xl border border-slate-200 bg-white/70 p-3 dark:border-slate-700 dark:bg-slate-800/60">
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Low</p>
+            <p className="mt-1 text-2xl font-bold leading-none text-slate-700 dark:text-slate-200">{priorityCounts.low}</p>
+          </div>
+        </div>
+        <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">Open the Priority tab to review the highest-urgency messages first.</p>
+      </div>
 
       {result.topics.length > 0 && (
         <div className="mt-4">

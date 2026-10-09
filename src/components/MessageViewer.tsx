@@ -106,10 +106,14 @@ export function ChatView({
   messages,
   windowStart,
   highlightId,
+  unreadAfterId,
+  unreadMode = false,
 }: {
   messages: Message[];
   windowStart: number;
   highlightId?: string | null;
+  unreadAfterId?: string;
+  unreadMode?: boolean;
 }) {
   if (messages.length === 0) {
     return <p className="p-4 text-sm text-slate-500">No messages loaded yet.</p>;
@@ -118,8 +122,10 @@ export function ChatView({
   const rows: ReactNode[] = [];
   let lastDay = "";
   let dividerPlaced = false;
+  const readIndex = unreadAfterId ? messages.findIndex((message) => message.id === unreadAfterId) : -1;
+  const unreadStartIndex = readIndex + 1;
 
-  messages.forEach((message) => {
+  messages.forEach((message, index) => {
     const day = formatDay(message.timestamp);
     if (day !== lastDay) {
       rows.push(
@@ -129,7 +135,10 @@ export function ChatView({
       );
       lastDay = day;
     }
-    if (!dividerPlaced && windowStart > 0 && message.timestamp >= windowStart) {
+    const isCatchupStart = unreadMode
+      ? index === unreadStartIndex
+      : windowStart > 0 && message.timestamp >= windowStart;
+    if (!dividerPlaced && isCatchupStart) {
       dividerPlaced = true;
       rows.push(
         <li
@@ -137,7 +146,7 @@ export function ChatView({
           className="my-3 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wide text-brand-600 dark:text-brand-300"
         >
           <span className="h-px flex-1 bg-brand-200 dark:bg-brand-800" />
-          Unread since your last visit
+          {unreadMode ? "Unread starts here" : "Catch-up window starts here"}
           <span className="h-px flex-1 bg-brand-200 dark:bg-brand-800" />
         </li>,
       );

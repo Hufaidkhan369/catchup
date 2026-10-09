@@ -20,17 +20,17 @@ export function Header({
 }: HeaderProps) {
   return (
     <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/85 backdrop-blur dark:border-slate-800 dark:bg-slate-950/85">
-      <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-2 px-4 py-3">
+      <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-2 px-4 py-3 sm:px-6 sm:py-3.5">
         <div className="mr-auto flex items-center gap-2">
           <span
             aria-hidden="true"
-            className="grid h-9 w-9 place-items-center rounded-xl bg-brand-600 text-lg font-bold text-white shadow-sm"
+            className="grid h-10 w-10 place-items-center rounded-[.9rem] bg-gradient-to-br from-indigo-500 to-brand-700 text-lg font-bold text-white shadow-[0_5px_14px_rgba(49,98,245,.28)] ring-1 ring-white/30"
           >
             C
           </span>
           <div className="leading-tight">
-            <h1 className="text-lg font-bold">CatchUp</h1>
-            <p className="text-xs text-slate-500 dark:text-slate-400">What did I miss?</p>
+            <h1 className="text-[15px] font-bold tracking-tight">CatchUp</h1>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400">Your chats, in focus</p>
           </div>
         </div>
 

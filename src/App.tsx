@@ -48,6 +48,8 @@ export default function App() {
   >([]);
   const [since, setSince] = useState<SinceWindow>("24h");
   const [customHours, setCustomHours] = useState(24);
+  const [analysisScope, setAnalysisScope] = useState<"window" | "unread">("window");
+  const [unreadAfterId, setUnreadAfterId] = useState("");
   const [result, setResult] = useState<CatchupResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -65,10 +67,11 @@ export default function App() {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const [storedProfile, storedMessages, storedDone] = await Promise.all([
+      const [storedProfile, storedMessages, storedDone, storedReadThrough] = await Promise.all([
         idbGet<UserProfile>(KEYS.profile),
         idbGet<Message[]>(KEYS.messages),
         idbGet<string[]>(KEYS.done),
+        idbGet<string>(KEYS.readThrough),
       ]);
       if (cancelled) return;
       if (storedProfile) setProfile(storedProfile);
@@ -76,6 +79,7 @@ export default function App() {
         setMessages(storedMessages);
       }
       if (Array.isArray(storedDone)) setDoneIds(new Set(storedDone));
+      if (typeof storedReadThrough === "string") setUnreadAfterId(storedReadThrough);
     })();
 
     const detachOnline = () => {
@@ -116,6 +120,9 @@ export default function App() {
   useEffect(() => {
     void idbSet(KEYS.done, [...doneIds]);
   }, [doneIds]);
+  useEffect(() => {
+    void idbSet(KEYS.readThrough, unreadAfterId);
+  }, [unreadAfterId]);
 
   // ---- Analysis ---------------------------------------------------------
   const runAnalysis = async () => {
@@ -124,11 +131,23 @@ export default function App() {
     setError(null);
     const nowAtRun = Date.now();
     try {
+      const readIndex = unreadAfterId ? messages.findIndex((message) => message.id === unreadAfterId) : -1;
+      const unreadMessages = messages.slice(readIndex + 1);
       const start = windowStart(since, nowAtRun, customHours);
+      const candidates = analysisScope === "unread" ? unreadMessages : messages;
       const windowed =
-        since === "all" ? messages : messages.filter((m) => m.timestamp >= start);
+        analysisScope === "unread" || since === "all"
+          ? candidates
+          : candidates.filter((message) => message.timestamp >= start);
+      const analysedCount = windowed.filter((message) => !message.isSystem).length;
+      const lastReadMessage = readIndex >= 0 ? messages[readIndex] : null;
+      const resultWindowLabel = analysisScope === "unread"
+        ? lastReadMessage
+          ? `Unread after ${lastReadMessage.sender}`
+          : "Unread · entire import"
+        : windowLabel(since, customHours);
 
-      if (windowed.length === 0) {
+      if (analysedCount === 0) {
         setResult({
           tldr: "No messages in this window. Widen the catch-up window and try again.",
           topics: [],
@@ -138,8 +157,8 @@ export default function App() {
           mentions: [],
           questions: [],
           engine: engine.info,
-          windowLabel: windowLabel(since, customHours),
-          messageCount: 0,
+          windowLabel: resultWindowLabel,
+          messageCount: analysedCount,
           generatedAt: nowAtRun,
         });
         return;
@@ -170,8 +189,8 @@ export default function App() {
         mentions: extracted.mentions,
         questions: extracted.questions,
         engine: summary.engine,
-        windowLabel: windowLabel(since, customHours),
-        messageCount: windowed.length,
+        windowLabel: resultWindowLabel,
+        messageCount: analysedCount,
         generatedAt: nowAtRun,
       });
     } catch (cause) {
@@ -197,12 +216,14 @@ export default function App() {
   const handleParse = (text: string) => {
     const parsed = parseChat(text);
     setMessages(parsed.messages);
+    setUnreadAfterId("");
     setWarnings(parsed.warnings);
   };
 
   const handleDemo = () => {
     const demo = buildDemoChat();
     setMessages(demo);
+    setUnreadAfterId("");
     setWarnings([]);
   };
 
@@ -216,6 +237,7 @@ export default function App() {
     setResult(null);
     setDoneIds(new Set());
     setProfile(DEFAULT_PROFILE);
+    setUnreadAfterId("");
   };
 
   const handleEnableWebllm = () => {
@@ -322,7 +344,7 @@ export default function App() {
     });
   };
 
-  const windowStartTs = since === "all" ? 0 : windowStart(since, now, customHours);
+  const windowStartTs = analysisScope === "unread" || since === "all" ? 0 : windowStart(since, now, customHours);
 
   return (
     <div className="min-h-dvh">
@@ -335,7 +357,27 @@ export default function App() {
         onOpenEngine={() => setEngineOpen(true)}
       />
 
-      <main id="main" className="mx-auto max-w-5xl space-y-4 px-4 py-5">
+      <main id="main" className="mx-auto max-w-6xl space-y-5 px-4 py-7 sm:px-6 sm:py-10">
+        <section className="welcome-card relative overflow-hidden rounded-[1.75rem] px-6 py-8 sm:px-9 sm:py-10">
+          <div className="welcome-orb" aria-hidden="true" />
+          <div className="relative max-w-2xl">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-semibold tracking-wide text-white/90 backdrop-blur">
+              <span className="h-2 w-2 rounded-full bg-emerald-300 shadow-[0_0_10px_rgba(110,231,183,.8)]" />
+              YOUR CONVERSATION, BACK IN FOCUS
+            </div>
+            <h2 className="max-w-xl text-3xl font-semibold leading-tight tracking-tight text-white sm:text-4xl">
+              A calmer way to catch up.
+            </h2>
+            <p className="mt-3 max-w-xl text-sm leading-relaxed text-indigo-100/85 sm:text-base">
+              Find the decisions, action items, and messages that matter — without scrolling through everything.
+            </p>
+          </div>
+          <div className="relative mt-6 flex flex-wrap gap-2 text-xs font-medium text-white/85 sm:mt-7">
+            <span className="rounded-full border border-white/15 bg-white/10 px-3 py-1.5">Private by design</span>
+            <span className="rounded-full border border-white/15 bg-white/10 px-3 py-1.5">Works right in your browser</span>
+          </div>
+        </section>
+
         <div className="grid gap-4 lg:grid-cols-2">
           <ProfilePanel profile={profile} onChange={setProfile} />
           <ImportPanel onParse={handleParse} onDemo={handleDemo} messageCount={messages.length} warnings={warnings} />
@@ -344,8 +386,13 @@ export default function App() {
         <CatchupWindowPicker
           value={since}
           customHours={customHours}
+          scope={analysisScope}
+          messages={messages}
+          lastReadMessageId={unreadAfterId}
           onValueChange={setSince}
           onCustomHoursChange={setCustomHours}
+          onScopeChange={setAnalysisScope}
+          onLastReadChange={setUnreadAfterId}
           onAnalyze={() => void runAnalysis()}
           loading={loading}
           disabled={messages.length === 0}
@@ -403,7 +450,12 @@ export default function App() {
             )}
 
             {activeTab === "chat" ? (
-              <ChatView messages={messages} windowStart={windowStartTs} />
+              <ChatView
+                messages={messages}
+                windowStart={windowStartTs}
+                unreadAfterId={analysisScope === "unread" ? unreadAfterId : undefined}
+                unreadMode={analysisScope === "unread"}
+              />
             ) : (
               <div
                 role="tabpanel"

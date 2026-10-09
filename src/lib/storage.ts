@@ -95,6 +95,7 @@ export const KEYS = {
   profile: "profile",
   messages: "messages",
   done: "done-items",
+  readThrough: "read-through-message",
   theme: "theme",
   since: "since-window",
 } as const;
