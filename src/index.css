@@ -208,3 +208,25 @@ html.dark main [role="tabpanel"] li:hover { border-color: #4b9b68; }
   body { font-size: 16px; }
   .welcome-card { transform: none; }
 }
+
+/* Chat wallpaper: warm paper and a quiet, repeating set of hand-drawn chat doodles. */
+body {
+  background-color: #efeae2;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 300'%3E%3Cg fill='none' stroke='%23bdb4a6' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' opacity='.42'%3E%3Cpath d='M22 36h42a9 9 0 0 1 9 9v20a9 9 0 0 1-9 9H47l-12 9v-9h-13a9 9 0 0 1-9-9V45a9 9 0 0 1 9-9z'/%3E%3Cpath d='M210 25l3 8 8 3-8 3-3 8-3-8-8-3 8-3z'/%3E%3Ccircle cx='145' cy='55' r='12'/%3E%3Cpath d='M140 55h10M145 50v10'/%3E%3Cpath d='M195 105h45a9 9 0 0 1 9 9v18a9 9 0 0 1-9 9h-12l-12 9v-9h-21a9 9 0 0 1-9-9v-18a9 9 0 0 1 9-9z'/%3E%3Cpath d='M36 137c-13 0-23 9-23 20 0 7 4 12 10 16l-2 9 11-5c2 0 3 1 5 1 13 0 23-9 23-21s-10-20-24-20z'/%3E%3Cpath d='M134 130l3 8 8 3-8 3-3 8-3-8-8-3 8-3z'/%3E%3Cpath d='M88 220l14-25 14 25h-9v18H97v-18z'/%3E%3Ccircle cx='208' cy='215' r='16'/%3E%3Cpath d='M201 214q7-8 14 0M203 222q5 4 10 0'/%3E%3Cpath d='M20 264h36M38 246v36'/%3E%3Cpath d='M265 181l3 8 8 3-8 3-3 8-3-8-8-3 8-3z'/%3E%3Ccircle cx='145' cy='258' r='6'/%3E%3C/g%3E%3C/svg%3E"),
+    radial-gradient(ellipse at 92% 7%, rgba(255, 214, 232, .12), transparent 30%),
+    radial-gradient(ellipse at 5% 42%, rgba(186, 228, 224, .12), transparent 32%);
+  background-size: 300px 300px, cover, cover;
+  background-attachment: fixed;
+  background-position: center top;
+}
+html.dark body {
+  background-color: #0b141a;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 300'%3E%3Cg fill='none' stroke='%2340545a' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' opacity='.42'%3E%3Cpath d='M22 36h42a9 9 0 0 1 9 9v20a9 9 0 0 1-9 9H47l-12 9v-9h-13a9 9 0 0 1-9-9V45a9 9 0 0 1 9-9z'/%3E%3Cpath d='M210 25l3 8 8 3-8 3-3 8-3-8-8-3 8-3z'/%3E%3Ccircle cx='145' cy='55' r='12'/%3E%3Cpath d='M140 55h10M145 50v10'/%3E%3Cpath d='M195 105h45a9 9 0 0 1 9 9v18a9 9 0 0 1-9 9h-12l-12 9v-9h-21a9 9 0 0 1-9-9v-18a9 9 0 0 1 9-9z'/%3E%3Cpath d='M36 137c-13 0-23 9-23 20 0 7 4 12 10 16l-2 9 11-5c2 0 3 1 5 1 13 0 23-9 23-21s-10-20-24-20z'/%3E%3Cpath d='M134 130l3 8 8 3-8 3-3 8-3-8-8-3 8-3z'/%3E%3Cpath d='M88 220l14-25 14 25h-9v18H97v-18z'/%3E%3Ccircle cx='208' cy='215' r='16'/%3E%3Cpath d='M201 214q7-8 14 0M203 222q5 4 10 0'/%3E%3Cpath d='M20 264h36M38 246v36'/%3E%3Cpath d='M265 181l3 8 8 3-8 3-3 8-3-8-8-3 8-3z'/%3E%3Ccircle cx='145' cy='258' r='6'/%3E%3C/g%3E%3C/svg%3E"),
+    radial-gradient(ellipse at 94% 8%, rgba(175, 54, 150, .1), transparent 32%),
+    radial-gradient(ellipse at 4% 42%, rgba(17, 150, 181, .1), transparent 34%);
+  background-size: 300px 300px, cover, cover;
+  background-attachment: fixed;
+  background-position: center top;
+}
