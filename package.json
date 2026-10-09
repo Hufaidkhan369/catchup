@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "CatchUp - a local-first AI micro-app that helps you read what you missed in busy chat conversations.",
+  "description": "Gugli AI - a local-first assistant that helps you read what you missed in busy chat conversations.",
   "license": "MIT",
   "scripts": {
     "dev": "vite",

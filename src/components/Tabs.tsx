@@ -15,7 +15,7 @@ export function Tabs({ tabs, active, onChange }: TabsProps) {
   return (
     <div
       role="tablist"
-      aria-label="CatchUp sections"
+      aria-label="Gugli AI sections"
       className="feature-tabs"
     >
       {tabs.map((tab) => {

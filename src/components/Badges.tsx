@@ -102,7 +102,7 @@ export function OfflineDot({ online }: { online: boolean }) {
   return (
     <span
       className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-300"
-      title={online ? "Browser reports online. CatchUp still works fully offline." : "Offline - CatchUp works fully offline."}
+      title={online ? "Browser reports online. Gugli AI still works fully offline." : "Offline - Gugli AI works fully offline."}
     >
       <span
         className={`h-2 w-2 rounded-full ${online ? "bg-emerald-500" : "bg-slate-400"}`}

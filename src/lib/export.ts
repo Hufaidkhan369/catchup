@@ -29,7 +29,7 @@ export function toMarkdown(
   now: number = Date.now(),
 ): string {
   return [
-    `# CatchUp summary${profile.name ? ` for ${profile.name}` : ""}`,
+    `# Gugli AI summary${profile.name ? ` for ${profile.name}` : ""}`,
     "",
     `_${result.windowLabel} · ${result.messageCount} messages · engine: ${result.engine.label} · generated ${formatDateTime(result.generatedAt)}_`,
     "",
@@ -51,7 +51,7 @@ export function toMarkdown(
     section("Mentions & questions for you", result.mentions, now),
     "",
     "---",
-    "_Generated locally by CatchUp. No data left this device._",
+    "_Generated locally by Gugli AI. No data left this device._",
   ].join("\n");
 }
 
@@ -61,7 +61,7 @@ export function toPlainText(
   now: number = Date.now(),
 ): string {
   const out: string[] = [];
-  out.push(`CatchUp summary${profile.name ? ` for ${profile.name}` : ""}`);
+  out.push(`Gugli AI summary${profile.name ? ` for ${profile.name}` : ""}`);
   out.push(`${result.windowLabel} - ${result.messageCount} messages - engine: ${result.engine.label}`);
   out.push("");
   out.push("TL;DR");
@@ -82,7 +82,7 @@ export function toPlainText(
   pushItems("Action items", result.actions);
   pushItems("Announcements", result.announcements);
   pushItems("Mentions & questions", result.mentions);
-  out.push("Generated locally by CatchUp. No data left this device.");
+  out.push("Generated locally by Gugli AI. No data left this device.");
   return out.join("\n");
 }
 

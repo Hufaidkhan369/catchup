@@ -336,7 +336,7 @@ export default function App() {
     if (!result) return;
     const content =
       format === "md" ? toMarkdown(result, profile, now) : toPlainText(result, profile, now);
-    downloadText(`catchup-summary-${Date.now()}.${format === "md" ? "md" : "txt"}`, content);
+    downloadText(`gugli-ai-summary-${Date.now()}.${format === "md" ? "md" : "txt"}`, content);
   };
 
   const handleCopy = async () => {
@@ -428,7 +428,7 @@ export default function App() {
                 {messages.length === 0 && !loading && (
                   <div className="mx-auto max-w-xl rounded-2xl border border-white/90 bg-white/90 p-7 text-center shadow-lg dark:border-slate-700 dark:bg-slate-900/95">
                     <span className="mb-3 inline-grid h-14 w-14 place-items-center rounded-full bg-emerald-100 text-2xl text-emerald-700 dark:bg-emerald-950 dark:text-emerald-200" aria-hidden="true">☏</span>
-                    <p className="text-lg font-semibold text-slate-800 dark:text-slate-100">Welcome to CatchUp</p>
+                    <p className="text-lg font-semibold text-slate-800 dark:text-slate-100">Welcome to Gugli AI</p>
                     <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">Import a chat or load the demo, then summarize unread messages to see what matters.</p>
                   </div>
                 )}
@@ -473,7 +473,7 @@ export default function App() {
       </main>
 
       <footer className="mx-auto max-w-5xl px-4 py-6 text-center text-[11px] text-slate-400">
-        CatchUp Â· local-first Â· no conversations leave this device Â· demo data released under CC0 Â·
+        Gugli AI · local-first · no conversations leave this device · demo data released under CC0 ·
         click through every tab with your own exported chat, not just the demo.
       </footer>
 

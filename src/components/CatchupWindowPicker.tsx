@@ -94,7 +94,7 @@ export function CatchupWindowPicker({
             ))}
           </select>
           <p className="mt-2 text-xs leading-relaxed text-slate-600 dark:text-slate-300">
-            Chat exports donâ€™t include read receipts. Choose your last read message; CatchUp will summarize and rank everything after it. With no message selected, the whole import is treated as unread.
+            Chat exports donâ€™t include read receipts. Choose your last read message; Gugli AI will summarize and rank everything after it. With no message selected, the whole import is treated as unread.
           </p>
         </div>
       ) : (

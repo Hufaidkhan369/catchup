@@ -1,4 +1,4 @@
-# CatchUp — "What did I miss?"
+# Gugli AI — "What did I miss?"
 
 A **local-first AI micro-app** that helps you quickly understand busy group chats: it summarises
 long or unread conversations, extracts the decisions and action items, works out what is *urgent*
@@ -97,7 +97,7 @@ Open the printed `http://localhost:5173`, click **Load demo chat**, pick a catch
 
 ### Enabling a real neural model
 
-- **Gemini Nano** — open in **Chrome 138+** (desktop). CatchUp auto-detects the Prompt API
+- **Gemini Nano** — open in **Chrome 138+** (desktop). Gugli AI auto-detects the Prompt API
   (`LanguageModel`) and uses it. No setup.
 - **WebLLM** — open the **engine panel** (click the engine badge) and tap *Download & enable
   WebLLM*. This fetches small open model weights (~1 GB, e.g. Llama-3.2-1B) and runs them via

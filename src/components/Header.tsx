@@ -29,7 +29,7 @@ export function Header({
             C
           </span>
           <div className="leading-tight">
-            <h1 className="text-[15px] font-bold tracking-tight">CatchUp</h1>
+            <h1 className="text-[15px] font-bold tracking-tight">Gugli AI</h1>
             <p className="text-[11px] text-slate-500 dark:text-slate-400">Your chats, in focus</p>
           </div>
         </div>
