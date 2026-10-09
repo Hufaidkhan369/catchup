@@ -4,7 +4,7 @@
 
 :root {
   color-scheme: light;
-  font-family: "Aptos", "Segoe UI Variable", "Segoe UI", sans-serif;
+  font-family: "Trebuchet MS", "Segoe UI Variable", "Segoe UI", sans-serif;
   font-optical-sizing: auto;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -17,8 +17,8 @@ html, body, #root { min-height: 100%; }
 
 body {
   @apply text-slate-900 antialiased dark:text-slate-100;
-  background-color: #f5f8f7;
-  background-image: radial-gradient(ellipse at 50% -20%, rgba(203, 234, 223, .62), transparent 55%);
+  background-color: #f3f7f1;
+  background-image: radial-gradient(ellipse at 50% -20%, rgba(196, 247, 210, .62), transparent 55%);
 }
 
 html.dark body {
@@ -26,7 +26,7 @@ html.dark body {
   background-image: radial-gradient(ellipse at 50% -25%, rgba(32, 75, 67, .5), transparent 55%);
 }
 
-::selection { background: rgba(99, 102, 241, .2); }
+::selection { background: rgba(37, 211, 102, .22); }
 
 header {
   box-shadow: 0 1px 0 rgba(15, 23, 42, .03), 0 8px 24px rgba(15, 23, 42, .035);
@@ -85,7 +85,7 @@ input:not([type="file"]), textarea, select {
 }
 
 input:not([type="file"]):focus, textarea:focus, select:focus {
-  box-shadow: 0 0 0 4px rgba(99, 102, 241, .12);
+  box-shadow: 0 0 0 4px rgba(37, 211, 102, .16);
 }
 
 button { -webkit-tap-highlight-color: transparent; }
@@ -106,3 +106,19 @@ footer { line-height: 1.75; }
 
 ::-webkit-scrollbar { width: 10px; height: 10px; }
 ::-webkit-scrollbar-thumb { @apply rounded-full bg-slate-300 dark:bg-slate-700; }
+
+
+/* A bright, friendly chat workspace with WhatsApp-inspired greens. */
+header { box-shadow: 0 2px 18px rgba(13, 74, 45, .09); }
+.welcome-card {
+  background: linear-gradient(118deg, #075e54 0%, #087c55 48%, #25a85a 100%);
+  box-shadow: 0 18px 48px rgba(13, 105, 68, .22);
+}
+.welcome-orb { background: radial-gradient(circle at 35% 65%, rgba(184, 255, 203, .64), rgba(93, 220, 140, .22) 55%, transparent 70%); }
+main section[aria-labelledby] { border-color: #dbe9dd; box-shadow: 0 5px 20px rgba(20, 80, 44, .055); }
+main section[aria-labelledby]:hover { border-color: #b9e4c3; box-shadow: 0 10px 28px rgba(20, 80, 44, .09); }
+html.dark body { background-color: #0d1b17; background-image: radial-gradient(ellipse at 50% -25%, rgba(21, 93, 59, .38), transparent 55%); }
+
+.feature-tabs { scrollbar-width: thin; scrollbar-color: #91edb3 transparent; }
+.feature-tabs [role="tab"] { min-height: 2.75rem; }
+@media (max-width: 640px) { .feature-tabs { margin-inline: -0.25rem; padding-bottom: .55rem; border-radius: 1rem; } }

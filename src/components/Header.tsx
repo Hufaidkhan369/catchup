@@ -24,7 +24,7 @@ export function Header({
         <div className="mr-auto flex items-center gap-2">
           <span
             aria-hidden="true"
-            className="grid h-10 w-10 place-items-center rounded-[.9rem] bg-gradient-to-br from-indigo-500 to-brand-700 text-lg font-bold text-white shadow-[0_5px_14px_rgba(49,98,245,.28)] ring-1 ring-white/30"
+            className="grid h-10 w-10 place-items-center rounded-[.9rem] bg-gradient-to-br from-emerald-400 to-brand-700 text-lg font-bold text-white shadow-[0_5px_14px_rgba(18,140,75,.3)] ring-1 ring-white/30"
           >
             C
           </span>

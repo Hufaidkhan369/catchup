@@ -53,7 +53,7 @@ export default function App() {
   const [result, setResult] = useState<CatchupResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState("priority");
+  const [activeTab, setActiveTab] = useState("inbox");
   const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
   const [doneIds, setDoneIds] = useState<Set<string>>(new Set());
   const [selectedMessageId, setSelectedMessageId] = useState<string | null>(null);
@@ -316,11 +316,13 @@ export default function App() {
   };
 
   const tabs: TabDef[] = [
-    { id: "priority", label: "Priority", count: allItems.length },
-    { id: "actions", label: "Action items", count: result?.actions.length ?? 0 },
+    { id: "inbox", label: "Inbox", count: messages.length },
+    { id: "priority", label: "Important", count: allItems.filter((item) => item.priority === "high").length },
+    { id: "actions", label: "To-dos", count: result?.actions.length ?? 0 },
     { id: "decisions", label: "Decisions", count: result?.decisions.length ?? 0 },
     { id: "mentions", label: "Mentions", count: result?.mentions.length ?? 0 },
-    { id: "chat", label: "Chat", count: messages.length },
+    { id: "chat", label: "Messages", count: messages.length },
+    { id: "profile", label: "My profile", count: 0 },
   ];
 
   const handleExport = (format: "md" | "txt") => {
@@ -357,7 +359,7 @@ export default function App() {
         onOpenEngine={() => setEngineOpen(true)}
       />
 
-      <main id="main" className="mx-auto max-w-6xl space-y-5 px-4 py-7 sm:px-6 sm:py-10">
+      <main id="main" className="mx-auto max-w-6xl space-y-5 px-4 py-6 sm:px-6 sm:py-9">
         <section className="welcome-card relative overflow-hidden rounded-[1.75rem] px-6 py-8 sm:px-9 sm:py-10">
           <div className="welcome-orb" aria-hidden="true" />
           <div className="relative max-w-2xl">
@@ -378,115 +380,67 @@ export default function App() {
           </div>
         </section>
 
-        <div className="grid gap-4 lg:grid-cols-2">
-          <ProfilePanel profile={profile} onChange={setProfile} />
-          <ImportPanel onParse={handleParse} onDemo={handleDemo} messageCount={messages.length} warnings={warnings} />
-        </div>
-
-        <CatchupWindowPicker
-          value={since}
-          customHours={customHours}
-          scope={analysisScope}
-          messages={messages}
-          lastReadMessageId={unreadAfterId}
-          onValueChange={setSince}
-          onCustomHoursChange={setCustomHours}
-          onScopeChange={setAnalysisScope}
-          onLastReadChange={setUnreadAfterId}
-          onAnalyze={() => void runAnalysis()}
-          loading={loading}
-          disabled={messages.length === 0}
-        />
+        <Tabs tabs={tabs} active={activeTab} onChange={setActiveTab} />
 
         {error && (
-          <div role="alert" className="rounded-xl border border-red-300 bg-red-50 p-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-950/40 dark:text-red-200">
-            {error}
-          </div>
-        )}
-
-        {messages.length === 0 && !loading && (
-          <section className="rounded-2xl border border-dashed border-slate-300 p-8 text-center dark:border-slate-700">
-            <p className="text-sm text-slate-500 dark:text-slate-400">
-              No chat loaded. Paste a chat above or tap <strong>Load demo chat</strong> to see
-              CatchUp in action - it uses real parsing and on-device extraction.
-            </p>
-          </section>
+          <div role="alert" className="rounded-xl border border-red-300 bg-red-50 p-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-950/40 dark:text-red-200">{error}</div>
         )}
 
         {loading && (
-          <div
-            role="status"
-            className="flex items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-white p-8 dark:border-slate-800 dark:bg-slate-900"
-          >
-            <span
-              className="h-5 w-5 animate-spin rounded-full border-2 border-brand-300 border-t-brand-600"
-              aria-hidden="true"
-            />
-            <span className="text-sm text-slate-600 dark:text-slate-300">
-              Summarising with {engine.info.label}...
-            </span>
+          <div role="status" className="flex items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-white p-8 dark:border-slate-800 dark:bg-slate-900">
+            <span className="h-5 w-5 animate-spin rounded-full border-2 border-brand-300 border-t-brand-600" aria-hidden="true" />
+            <span className="text-sm text-slate-600 dark:text-slate-300">Summarising with {engine.info.label}...</span>
           </div>
         )}
 
-        {!loading && result && (
-          <>
-            <SummaryCard
-              result={result}
-              onExportMarkdown={() => handleExport("md")}
-              onExportText={() => handleExport("txt")}
-              onCopy={handleCopy}
+        {activeTab === "inbox" && <section role="tabpanel" id="panel-inbox" aria-labelledby="tab-inbox" className="space-y-5">
+          <div className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
+            <ImportPanel onParse={handleParse} onDemo={handleDemo} messageCount={messages.length} warnings={warnings} />
+            <CatchupWindowPicker
+              value={since} customHours={customHours} scope={analysisScope} messages={messages}
+              lastReadMessageId={unreadAfterId} onValueChange={setSince}
+              onCustomHoursChange={setCustomHours} onScopeChange={setAnalysisScope}
+              onLastReadChange={setUnreadAfterId} onAnalyze={() => void runAnalysis()}
+              loading={loading} disabled={messages.length === 0}
             />
+          </div>
+          {messages.length === 0 && !loading && (
+            <div className="rounded-2xl border border-dashed border-slate-300 bg-white/70 p-8 text-center dark:border-slate-700 dark:bg-slate-900/60">
+              <p className="text-sm text-slate-600 dark:text-slate-300">Your inbox is ready. Import a conversation or load the demo to see unread summaries, priorities, and next steps.</p>
+            </div>
+          )}
+          {!loading && result && <SummaryCard result={result} onExportMarkdown={() => handleExport("md")} onExportText={() => handleExport("txt")} onCopy={handleCopy} />}
+        </section>}
 
-            <Tabs tabs={tabs} active={activeTab} onChange={setActiveTab} />
+        {activeTab === "profile" && <div role="tabpanel" id="panel-profile" aria-labelledby="tab-profile"><ProfilePanel profile={profile} onChange={setProfile} /></div>}
 
+        {!loading && !result && activeTab !== "inbox" && activeTab !== "profile" && (
+          <div className="rounded-2xl border border-dashed border-emerald-200 bg-white/70 p-8 text-center shadow-sm dark:border-emerald-950 dark:bg-slate-900/70">
+            <p className="font-semibold text-slate-800 dark:text-slate-100">This space is ready for your chat.</p>
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Import a conversation and summarize it to fill your {tabs.find((tab) => tab.id === activeTab)?.label.toLowerCase()} view.</p>
+            <button type="button" onClick={() => setActiveTab("inbox")} className="mt-4 rounded-full bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700">Go to inbox</button>
+          </div>
+        )}
+
+        {!loading && result && activeTab !== "inbox" && activeTab !== "profile" && (
+          <section className="space-y-4" role="tabpanel" id={`panel-${activeTab}`} aria-labelledby={`tab-${activeTab}`}>
             {activeTab !== "chat" && (
-              <FilterBar
-                filters={filters}
-                senders={senders}
-                onChange={setFilters}
-                showTypeFilter={activeTab === "priority"}
-                resultCount={visibleByTab[activeTab]?.length ?? 0}
-              />
+              <FilterBar filters={filters} senders={senders} onChange={setFilters} showTypeFilter={activeTab === "priority"} resultCount={visibleByTab[activeTab]?.length ?? 0} />
             )}
-
             {activeTab === "chat" ? (
-              <ChatView
-                messages={messages}
-                windowStart={windowStartTs}
-                unreadAfterId={analysisScope === "unread" ? unreadAfterId : undefined}
-                unreadMode={analysisScope === "unread"}
-              />
+              <ChatView messages={messages} windowStart={windowStartTs} unreadAfterId={analysisScope === "unread" ? unreadAfterId : undefined} unreadMode={analysisScope === "unread"} />
             ) : (
-              <div
-                role="tabpanel"
-                id={`panel-${activeTab}`}
-                aria-labelledby={`tab-${activeTab}`}
-                className="space-y-2"
-              >
+              <div className="space-y-2">
                 {(visibleByTab[activeTab] ?? []).length === 0 ? (
-                  <p className="rounded-xl border border-dashed border-slate-300 p-6 text-center text-sm text-slate-500 dark:border-slate-700 dark:text-slate-400">
-                    Nothing matched in this window. Try widening the catch-up window or clearing the
-                    filters.
-                  </p>
+                  <p className="rounded-xl border border-dashed border-slate-300 bg-white/70 p-6 text-center text-sm text-slate-500 dark:border-slate-700 dark:text-slate-400">Nothing matched in this window. Try widening the catch-up window or clearing the filters.</p>
                 ) : (
                   <ul className="space-y-2">
-                    {(visibleByTab[activeTab] ?? []).map((item) => (
-                      <ItemCard
-                        key={item.id}
-                        item={item}
-                        message={messageById.get(item.messageId)}
-                        now={now}
-                        profile={profile}
-                        engine={engine}
-                        onJumpToMessage={setSelectedMessageId}
-                        onToggleDone={toggleDone}
-                      />
-                    ))}
+                    {(visibleByTab[activeTab] ?? []).map((item) => <ItemCard key={item.id} item={item} message={messageById.get(item.messageId)} now={now} profile={profile} engine={engine} onJumpToMessage={setSelectedMessageId} onToggleDone={toggleDone} />)}
                   </ul>
                 )}
               </div>
             )}
-          </>
+          </section>
         )}
       </main>
 
