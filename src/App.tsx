@@ -322,13 +322,14 @@ export default function App() {
   };
 
   const tabs: TabDef[] = [
-    { id: "inbox", label: "Inbox", count: messages.length },
-    { id: "priority", label: "Important", count: allItems.filter((item) => item.priority === "high").length },
-    { id: "actions", label: "To-dos", count: result?.actions.length ?? 0 },
-    { id: "decisions", label: "Decisions", count: result?.decisions.length ?? 0 },
-    { id: "mentions", label: "Mentions", count: result?.mentions.length ?? 0 },
-    { id: "chat", label: "Messages", count: messages.length },
-    { id: "profile", label: "My profile", count: 0 },
+    { id: "inbox", label: "Home", count: messages.length, icon: "⌂" },
+    { id: "summary", label: "Summary", count: result?.messageCount ?? 0, icon: "✦" },
+    { id: "priority", label: "Important", count: allItems.filter((item) => item.priority === "high").length, icon: "◈" },
+    { id: "actions", label: "To-dos", count: result?.actions.length ?? 0, icon: "✓" },
+    { id: "decisions", label: "Decisions", count: result?.decisions.length ?? 0, icon: "⇄" },
+    { id: "mentions", label: "Mentions", count: result?.mentions.length ?? 0, icon: "@" },
+    { id: "chat", label: "Messages", count: messages.length, icon: "▤" },
+    { id: "profile", label: "My profile", count: 0, icon: "☺" },
   ];
 
   const handleExport = (format: "md" | "txt") => {
@@ -366,12 +367,12 @@ export default function App() {
       />
 
       <main id="main" className="mx-auto max-w-[1500px] px-3 py-3 sm:px-5 sm:py-5">
-        <div className="whatsapp-app-shell grid min-h-[calc(100dvh-110px)] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl shadow-slate-900/10 dark:border-slate-700 dark:bg-slate-900">
+        <div className="whatsapp-app-shell catchup-workspace grid min-h-[calc(100dvh-110px)] overflow-hidden rounded-[1.6rem] border border-slate-200 bg-white shadow-2xl shadow-slate-900/10 dark:border-slate-700 dark:bg-slate-900">
           <aside className="whatsapp-sidebar min-w-0 border-b border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900 lg:border-b-0 lg:border-r">
             <div className="flex items-center justify-between border-b border-slate-200 px-5 py-5 dark:border-slate-700">
               <div>
-                <h2 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">Chats</h2>
-                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Your messages, in focus</p>
+                <h2 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">Your space</h2>
+                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Everything in one place</p>
               </div>
               <span className="grid h-11 w-11 place-items-center rounded-full bg-gradient-to-br from-emerald-400 to-emerald-700 text-xl text-white shadow-md" aria-hidden="true">✦</span>
             </div>
@@ -396,8 +397,8 @@ export default function App() {
             <div className="flex min-h-[76px] items-center gap-3 border-b border-slate-200 bg-slate-50 px-4 py-3 dark:border-slate-700 dark:bg-slate-800/90 sm:px-6">
               <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-gradient-to-br from-emerald-400 to-emerald-700 text-lg font-bold text-white shadow-sm" aria-hidden="true">C</span>
               <div className="min-w-0 flex-1">
-                <h2 className="truncate text-base font-bold text-slate-900 dark:text-white">CatchUp assistant</h2>
-                <p className="truncate text-sm text-slate-500 dark:text-slate-300">{messages.length ? `${messages.length} messages · private on-device workspace` : "Private chat · ready when you are"}</p>
+                <h2 className="truncate text-base font-bold text-slate-900 dark:text-white">{tabs.find((tab) => tab.id === activeTab)?.label ?? "Home"}</h2>
+                <p className="truncate text-sm text-slate-500 dark:text-slate-300">{messages.length ? `${messages.length} messages · private on-device workspace` : "Your private chat space · ready when you are"}</p>
               </div>
               <span className="hidden items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-800 sm:inline-flex dark:border-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-200">
                 <span className="h-2 w-2 rounded-full bg-emerald-500" /> On device
@@ -431,12 +432,19 @@ export default function App() {
                     <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">Import a chat or load the demo, then summarize unread messages to see what matters.</p>
                   </div>
                 )}
-                {!loading && result && <SummaryCard result={result} onExportMarkdown={() => handleExport("md")} onExportText={() => handleExport("txt")} onCopy={handleCopy} />}
+                {messages.length > 0 && <div className="home-nudge"><div><span className="eyebrow">YOUR CHAT, CAUGHT UP</span><h3>Good to see you, {profile.name}.</h3><p>Your messages stay on this device. Pick a time window, then get straight to what matters.</p></div><button type="button" onClick={() => setActiveTab("summary")}>View your summary <span aria-hidden="true">→</span></button></div>}
               </div>}
+
+              {activeTab === "summary" && <section className="feature-page" role="tabpanel" id="panel-summary" aria-labelledby="tab-summary">
+                <div className="feature-page-intro"><span className="eyebrow">THE SHORT VERSION</span><h2>Your catch-up</h2><p>A clear summary of the conversation, with the important bits ready to act on.</p></div>
+                <CatchupWindowPicker value={since} customHours={customHours} scope={analysisScope} messages={messages} lastReadMessageId={unreadAfterId} onValueChange={setSince} onCustomHoursChange={setCustomHours} onScopeChange={setAnalysisScope} onLastReadChange={setUnreadAfterId} onAnalyze={() => void runAnalysis()} loading={loading} disabled={messages.length === 0} notice={analysisNotice} />
+                {!loading && result && <SummaryCard result={result} onExportMarkdown={() => handleExport("md")} onExportText={() => handleExport("txt")} onCopy={handleCopy} />}
+                {!loading && !result && <div className="empty-state"><span aria-hidden="true">✦</span><h3>Your summary will show up here</h3><p>Import a conversation, then choose <strong>Summarize unread messages</strong> to see a helpful recap.</p><button type="button" onClick={() => setActiveTab("inbox")}>Import a conversation</button></div>}
+              </section>}
 
               {activeTab === "profile" && <div role="tabpanel" id="panel-profile" aria-labelledby="tab-profile"><ProfilePanel profile={profile} onChange={setProfile} /></div>}
 
-              {!loading && !result && activeTab !== "inbox" && activeTab !== "profile" && (
+              {!loading && !result && activeTab !== "inbox" && activeTab !== "profile" && activeTab !== "summary" && (
                 <div className="mx-auto mt-8 max-w-xl rounded-2xl border border-white/90 bg-white/90 p-8 text-center shadow-lg dark:border-slate-700 dark:bg-slate-900/95">
                   <p className="text-lg font-semibold text-slate-800 dark:text-slate-100">This chat view is ready.</p>
                   <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">Import a conversation in Inbox to fill your {tabs.find((tab) => tab.id === activeTab)?.label.toLowerCase()} view.</p>
@@ -444,8 +452,9 @@ export default function App() {
                 </div>
               )}
 
-              {!loading && result && activeTab !== "inbox" && activeTab !== "profile" && (
+              {!loading && result && activeTab !== "inbox" && activeTab !== "profile" && activeTab !== "summary" && (
                 <section className="space-y-4" role="tabpanel" id={`panel-${activeTab}`} aria-labelledby={`tab-${activeTab}`}>
+                  {activeTab !== "chat" && <div className="feature-page-intro"><span className="eyebrow">YOUR CONVERSATION, ORGANIZED</span><h2>{tabs.find((tab) => tab.id === activeTab)?.label}</h2><p>{activeTab === "priority" ? "The messages and follow-ups that need your attention first." : activeTab === "actions" ? "A simple list of things people said they would do." : activeTab === "decisions" ? "Choices and plans made in the conversation." : "Messages that mention you directly."}</p></div>}
                   {activeTab !== "chat" && <FilterBar filters={filters} senders={senders} onChange={setFilters} showTypeFilter={activeTab === "priority"} resultCount={visibleByTab[activeTab]?.length ?? 0} />}
                   {activeTab === "chat" ? (
                     <ChatView messages={messages} windowStart={windowStartTs} unreadAfterId={analysisScope === "unread" ? unreadAfterId : undefined} unreadMode={analysisScope === "unread"} profileName={profile.name} />
