@@ -52,6 +52,7 @@ export default function App() {
   const [unreadAfterId, setUnreadAfterId] = useState("");
   const [result, setResult] = useState<CatchupResult | null>(null);
   const [loading, setLoading] = useState(false);
+  const [analysisNotice, setAnalysisNotice] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("inbox");
   const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
@@ -129,6 +130,7 @@ export default function App() {
     if (messages.length === 0) return;
     setLoading(true);
     setError(null);
+    setAnalysisNotice("");
     const nowAtRun = Date.now();
     try {
       const readIndex = unreadAfterId ? messages.findIndex((message) => message.id === unreadAfterId) : -1;
@@ -144,12 +146,14 @@ export default function App() {
       const resultWindowLabel = analysisScope === "unread"
         ? lastReadMessage
           ? `Unread after ${lastReadMessage.sender}`
-          : "Unread · entire import"
+          : "Unread Â· entire import"
         : windowLabel(since, customHours);
 
       if (analysedCount === 0) {
         setResult({
-          tldr: "No messages in this window. Widen the catch-up window and try again.",
+          tldr: analysisScope === "unread"
+            ? "No unread messages found after your selected read point."
+            : "No messages in this window. Widen the catch-up window and try again.",
           topics: [],
           actions: [],
           decisions: [],
@@ -161,6 +165,7 @@ export default function App() {
           messageCount: analysedCount,
           generatedAt: nowAtRun,
         });
+        setAnalysisNotice(analysisScope === "unread" ? "Checked unread messages · none found after your read point." : "Summary refreshed · no messages in this window.");
         return;
       }
 
@@ -193,6 +198,7 @@ export default function App() {
         messageCount: analysedCount,
         generatedAt: nowAtRun,
       });
+      setAnalysisNotice(`${analysedCount} messages summarized${analysisScope === "unread" ? " from unread messages" : ""}.`);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Something went wrong while analysing.");
     } finally {
@@ -359,93 +365,106 @@ export default function App() {
         onOpenEngine={() => setEngineOpen(true)}
       />
 
-      <main id="main" className="mx-auto max-w-6xl space-y-5 px-4 py-6 sm:px-6 sm:py-9">
-        <section className="welcome-card relative overflow-hidden rounded-[1.75rem] px-6 py-8 sm:px-9 sm:py-10">
-          <div className="welcome-orb" aria-hidden="true" />
-          <div className="relative max-w-2xl">
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-semibold tracking-wide text-white/90 backdrop-blur">
-              <span className="h-2 w-2 rounded-full bg-emerald-300 shadow-[0_0_10px_rgba(110,231,183,.8)]" />
-              YOUR CONVERSATION, BACK IN FOCUS
-            </div>
-            <h2 className="max-w-xl text-3xl font-semibold leading-tight tracking-tight text-white sm:text-4xl">
-              A calmer way to catch up.
-            </h2>
-            <p className="mt-3 max-w-xl text-sm leading-relaxed text-indigo-100/85 sm:text-base">
-              Find the decisions, action items, and messages that matter — without scrolling through everything.
-            </p>
-          </div>
-          <div className="relative mt-6 flex flex-wrap gap-2 text-xs font-medium text-white/85 sm:mt-7">
-            <span className="rounded-full border border-white/15 bg-white/10 px-3 py-1.5">Private by design</span>
-            <span className="rounded-full border border-white/15 bg-white/10 px-3 py-1.5">Works right in your browser</span>
-          </div>
-        </section>
-
-        <Tabs tabs={tabs} active={activeTab} onChange={setActiveTab} />
-
-        {error && (
-          <div role="alert" className="rounded-xl border border-red-300 bg-red-50 p-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-950/40 dark:text-red-200">{error}</div>
-        )}
-
-        {loading && (
-          <div role="status" className="flex items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-white p-8 dark:border-slate-800 dark:bg-slate-900">
-            <span className="h-5 w-5 animate-spin rounded-full border-2 border-brand-300 border-t-brand-600" aria-hidden="true" />
-            <span className="text-sm text-slate-600 dark:text-slate-300">Summarising with {engine.info.label}...</span>
-          </div>
-        )}
-
-        {activeTab === "inbox" && <section role="tabpanel" id="panel-inbox" aria-labelledby="tab-inbox" className="space-y-5">
-          <div className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
-            <ImportPanel onParse={handleParse} onDemo={handleDemo} messageCount={messages.length} warnings={warnings} />
-            <CatchupWindowPicker
-              value={since} customHours={customHours} scope={analysisScope} messages={messages}
-              lastReadMessageId={unreadAfterId} onValueChange={setSince}
-              onCustomHoursChange={setCustomHours} onScopeChange={setAnalysisScope}
-              onLastReadChange={setUnreadAfterId} onAnalyze={() => void runAnalysis()}
-              loading={loading} disabled={messages.length === 0}
-            />
-          </div>
-          {messages.length === 0 && !loading && (
-            <div className="rounded-2xl border border-dashed border-slate-300 bg-white/70 p-8 text-center dark:border-slate-700 dark:bg-slate-900/60">
-              <p className="text-sm text-slate-600 dark:text-slate-300">Your inbox is ready. Import a conversation or load the demo to see unread summaries, priorities, and next steps.</p>
-            </div>
-          )}
-          {!loading && result && <SummaryCard result={result} onExportMarkdown={() => handleExport("md")} onExportText={() => handleExport("txt")} onCopy={handleCopy} />}
-        </section>}
-
-        {activeTab === "profile" && <div role="tabpanel" id="panel-profile" aria-labelledby="tab-profile"><ProfilePanel profile={profile} onChange={setProfile} /></div>}
-
-        {!loading && !result && activeTab !== "inbox" && activeTab !== "profile" && (
-          <div className="rounded-2xl border border-dashed border-emerald-200 bg-white/70 p-8 text-center shadow-sm dark:border-emerald-950 dark:bg-slate-900/70">
-            <p className="font-semibold text-slate-800 dark:text-slate-100">This space is ready for your chat.</p>
-            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Import a conversation and summarize it to fill your {tabs.find((tab) => tab.id === activeTab)?.label.toLowerCase()} view.</p>
-            <button type="button" onClick={() => setActiveTab("inbox")} className="mt-4 rounded-full bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700">Go to inbox</button>
-          </div>
-        )}
-
-        {!loading && result && activeTab !== "inbox" && activeTab !== "profile" && (
-          <section className="space-y-4" role="tabpanel" id={`panel-${activeTab}`} aria-labelledby={`tab-${activeTab}`}>
-            {activeTab !== "chat" && (
-              <FilterBar filters={filters} senders={senders} onChange={setFilters} showTypeFilter={activeTab === "priority"} resultCount={visibleByTab[activeTab]?.length ?? 0} />
-            )}
-            {activeTab === "chat" ? (
-              <ChatView messages={messages} windowStart={windowStartTs} unreadAfterId={analysisScope === "unread" ? unreadAfterId : undefined} unreadMode={analysisScope === "unread"} />
-            ) : (
-              <div className="space-y-2">
-                {(visibleByTab[activeTab] ?? []).length === 0 ? (
-                  <p className="rounded-xl border border-dashed border-slate-300 bg-white/70 p-6 text-center text-sm text-slate-500 dark:border-slate-700 dark:text-slate-400">Nothing matched in this window. Try widening the catch-up window or clearing the filters.</p>
-                ) : (
-                  <ul className="space-y-2">
-                    {(visibleByTab[activeTab] ?? []).map((item) => <ItemCard key={item.id} item={item} message={messageById.get(item.messageId)} now={now} profile={profile} engine={engine} onJumpToMessage={setSelectedMessageId} onToggleDone={toggleDone} />)}
-                  </ul>
-                )}
+      <main id="main" className="mx-auto max-w-[1500px] px-3 py-3 sm:px-5 sm:py-5">
+        <div className="whatsapp-app-shell grid min-h-[calc(100dvh-110px)] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl shadow-slate-900/10 dark:border-slate-700 dark:bg-slate-900">
+          <aside className="whatsapp-sidebar min-w-0 border-b border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900 lg:border-b-0 lg:border-r">
+            <div className="flex items-center justify-between border-b border-slate-200 px-5 py-5 dark:border-slate-700">
+              <div>
+                <h2 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">Chats</h2>
+                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Your messages, in focus</p>
               </div>
-            )}
+              <span className="grid h-11 w-11 place-items-center rounded-full bg-gradient-to-br from-emerald-400 to-emerald-700 text-xl text-white shadow-md" aria-hidden="true">✦</span>
+            </div>
+            <div className="border-b border-slate-200 p-2 dark:border-slate-700">
+              <button type="button" onClick={() => setActiveTab(messages.length ? "chat" : "inbox")} className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left transition hover:bg-emerald-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 dark:hover:bg-slate-800">
+                <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-emerald-100 text-xl text-emerald-800 dark:bg-emerald-950 dark:text-emerald-200" aria-hidden="true">◉</span>
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-sm font-semibold text-slate-900 dark:text-slate-100">{messages.length ? "Imported conversation" : "Start a conversation"}</span>
+                  <span className="mt-0.5 block truncate text-xs text-slate-500 dark:text-slate-400">{messages.length ? `${messages[messages.length - 1].sender}: ${messages[messages.length - 1].text}` : "Import a chat to see messages here"}</span>
+                </span>
+                {messages.length > 0 && <span className="rounded-full bg-emerald-600 px-2 py-0.5 text-xs font-semibold text-white">{messages.length}</span>}
+              </button>
+            </div>
+            <Tabs tabs={tabs} active={activeTab} onChange={setActiveTab} />
+            <div className="mx-4 mb-4 mt-2 rounded-xl border border-emerald-100 bg-emerald-50/80 p-3 text-sm text-emerald-900 dark:border-emerald-900/60 dark:bg-emerald-950/30 dark:text-emerald-100">
+              <p className="font-semibold">Private by design</p>
+              <p className="mt-1 text-xs leading-relaxed text-emerald-800/80 dark:text-emerald-200/80">Your conversation stays in this browser.</p>
+            </div>
+          </aside>
+
+          <section className="whatsapp-chat-pane flex min-w-0 flex-col">
+            <div className="flex min-h-[76px] items-center gap-3 border-b border-slate-200 bg-slate-50 px-4 py-3 dark:border-slate-700 dark:bg-slate-800/90 sm:px-6">
+              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-gradient-to-br from-emerald-400 to-emerald-700 text-lg font-bold text-white shadow-sm" aria-hidden="true">C</span>
+              <div className="min-w-0 flex-1">
+                <h2 className="truncate text-base font-bold text-slate-900 dark:text-white">CatchUp assistant</h2>
+                <p className="truncate text-sm text-slate-500 dark:text-slate-300">{messages.length ? `${messages.length} messages · private on-device workspace` : "Private chat · ready when you are"}</p>
+              </div>
+              <span className="hidden items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-800 sm:inline-flex dark:border-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-200">
+                <span className="h-2 w-2 rounded-full bg-emerald-500" /> On device
+              </span>
+            </div>
+
+            <div className="whatsapp-conversation min-h-0 flex-1 overflow-y-auto p-3 sm:p-5">
+              {error && <div role="alert" className="mb-4 rounded-xl border border-red-300 bg-red-50 p-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-950/60 dark:text-red-200">{error}</div>}
+              {loading && (
+                <div role="status" className="mb-4 flex items-center gap-3 rounded-2xl border border-emerald-200 bg-white/95 p-4 shadow-lg dark:border-emerald-900 dark:bg-slate-900/95">
+                  <span className="h-5 w-5 animate-spin rounded-full border-2 border-brand-300 border-t-brand-600" aria-hidden="true" />
+                  <span className="text-sm font-medium text-slate-700 dark:text-slate-200">Summarising with {engine.info.label}...</span>
+                </div>
+              )}
+
+              {activeTab === "inbox" && <div role="tabpanel" id="panel-inbox" aria-labelledby="tab-inbox" className="space-y-4">
+                <div className="grid gap-4 xl:grid-cols-[.9fr_1.1fr]">
+                  <ImportPanel onParse={handleParse} onDemo={handleDemo} messageCount={messages.length} warnings={warnings} />
+                  <CatchupWindowPicker
+                    value={since} customHours={customHours} scope={analysisScope} messages={messages}
+                    lastReadMessageId={unreadAfterId} onValueChange={setSince}
+                    onCustomHoursChange={setCustomHours} onScopeChange={setAnalysisScope}
+                    onLastReadChange={setUnreadAfterId} onAnalyze={() => void runAnalysis()}
+                    loading={loading} disabled={messages.length === 0} notice={analysisNotice}
+                  />
+                </div>
+                {messages.length === 0 && !loading && (
+                  <div className="mx-auto max-w-xl rounded-2xl border border-white/90 bg-white/90 p-7 text-center shadow-lg dark:border-slate-700 dark:bg-slate-900/95">
+                    <span className="mb-3 inline-grid h-14 w-14 place-items-center rounded-full bg-emerald-100 text-2xl text-emerald-700 dark:bg-emerald-950 dark:text-emerald-200" aria-hidden="true">☏</span>
+                    <p className="text-lg font-semibold text-slate-800 dark:text-slate-100">Welcome to CatchUp</p>
+                    <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">Import a chat or load the demo, then summarize unread messages to see what matters.</p>
+                  </div>
+                )}
+                {!loading && result && <SummaryCard result={result} onExportMarkdown={() => handleExport("md")} onExportText={() => handleExport("txt")} onCopy={handleCopy} />}
+              </div>}
+
+              {activeTab === "profile" && <div role="tabpanel" id="panel-profile" aria-labelledby="tab-profile"><ProfilePanel profile={profile} onChange={setProfile} /></div>}
+
+              {!loading && !result && activeTab !== "inbox" && activeTab !== "profile" && (
+                <div className="mx-auto mt-8 max-w-xl rounded-2xl border border-white/90 bg-white/90 p-8 text-center shadow-lg dark:border-slate-700 dark:bg-slate-900/95">
+                  <p className="text-lg font-semibold text-slate-800 dark:text-slate-100">This chat view is ready.</p>
+                  <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">Import a conversation in Inbox to fill your {tabs.find((tab) => tab.id === activeTab)?.label.toLowerCase()} view.</p>
+                  <button type="button" onClick={() => setActiveTab("inbox")} className="mt-4 rounded-full bg-brand-700 px-5 py-2.5 text-sm font-semibold text-white shadow-md hover:bg-brand-600">Go to inbox</button>
+                </div>
+              )}
+
+              {!loading && result && activeTab !== "inbox" && activeTab !== "profile" && (
+                <section className="space-y-4" role="tabpanel" id={`panel-${activeTab}`} aria-labelledby={`tab-${activeTab}`}>
+                  {activeTab !== "chat" && <FilterBar filters={filters} senders={senders} onChange={setFilters} showTypeFilter={activeTab === "priority"} resultCount={visibleByTab[activeTab]?.length ?? 0} />}
+                  {activeTab === "chat" ? (
+                    <ChatView messages={messages} windowStart={windowStartTs} unreadAfterId={analysisScope === "unread" ? unreadAfterId : undefined} unreadMode={analysisScope === "unread"} profileName={profile.name} />
+                  ) : (
+                    <div className="space-y-2">
+                      {(visibleByTab[activeTab] ?? []).length === 0 ? <p className="rounded-xl border border-dashed border-white/80 bg-white/85 p-6 text-center text-sm text-slate-600 shadow-sm dark:border-slate-700 dark:bg-slate-900/85 dark:text-slate-300">Nothing matched in this window. Try widening the catch-up window or clearing the filters.</p> : (
+                        <ul className="space-y-2">{(visibleByTab[activeTab] ?? []).map((item) => <ItemCard key={item.id} item={item} message={messageById.get(item.messageId)} now={now} profile={profile} engine={engine} onJumpToMessage={setSelectedMessageId} onToggleDone={toggleDone} />)}</ul>
+                      )}
+                    </div>
+                  )}
+                </section>
+              )}
+            </div>
           </section>
-        )}
+        </div>
       </main>
 
       <footer className="mx-auto max-w-5xl px-4 py-6 text-center text-[11px] text-slate-400">
-        CatchUp · local-first · no conversations leave this device · demo data released under CC0 ·
+        CatchUp Â· local-first Â· no conversations leave this device Â· demo data released under CC0 Â·
         click through every tab with your own exported chat, not just the demo.
       </footer>
 

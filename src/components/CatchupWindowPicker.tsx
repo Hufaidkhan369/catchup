@@ -14,6 +14,7 @@ interface WindowPickerProps {
   onAnalyze: () => void;
   loading: boolean;
   disabled: boolean;
+  notice: string;
 }
 
 const OPTIONS: Array<{ value: SinceWindow; label: string }> = [
@@ -36,6 +37,7 @@ export function CatchupWindowPicker({
   onAnalyze,
   loading,
   disabled,
+  notice,
 }: WindowPickerProps) {
   const readableMessages = messages.filter((message) => !message.isSystem);
 
@@ -84,15 +86,15 @@ export function CatchupWindowPicker({
             onChange={(event) => onLastReadChange(event.target.value)}
             className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:focus:ring-brand-900"
           >
-            <option value="">I haven’t read any of these messages</option>
+            <option value="">I havenâ€™t read any of these messages</option>
             {readableMessages.map((message) => (
               <option key={message.id} value={message.id}>
-                {formatDateTime(message.timestamp)} · {message.sender}: {message.text.replace(/\s+/g, " ").slice(0, 90)}
+                {formatDateTime(message.timestamp)} Â· {message.sender}: {message.text.replace(/\s+/g, " ").slice(0, 90)}
               </option>
             ))}
           </select>
           <p className="mt-2 text-xs leading-relaxed text-slate-600 dark:text-slate-300">
-            Chat exports don’t include read receipts. Choose your last read message; CatchUp will summarize and rank everything after it. With no message selected, the whole import is treated as unread.
+            Chat exports donâ€™t include read receipts. Choose your last read message; CatchUp will summarize and rank everything after it. With no message selected, the whole import is treated as unread.
           </p>
         </div>
       ) : (
@@ -141,7 +143,10 @@ export function CatchupWindowPicker({
         </div>
       )}
 
-      <div className="flex justify-end">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p role="status" aria-live="polite" className={`min-h-6 text-sm font-semibold ${notice ? "text-emerald-700 dark:text-emerald-300" : "text-transparent"}`}>
+          {notice || "Ready to summarize"}
+        </p>
         <button
           type="button"
           onClick={onAnalyze}
@@ -151,7 +156,7 @@ export function CatchupWindowPicker({
           {loading && (
             <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/40 border-t-white" aria-hidden="true" />
           )}
-          {loading ? "Summarising..." : scope === "unread" ? "Summarize unread" : "Analyse chat"}
+          {loading ? "Summarising..." : scope === "unread" ? "Summarize unread messages" : "Summarize recent messages"}
         </button>
       </div>
     </section>

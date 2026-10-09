@@ -6,29 +6,24 @@ import { formatClock, formatDay, formatDateTime } from "../lib/time";
 function MessageRow({
   message,
   highlight,
+  own = false,
 }: {
   message: Message;
   highlight?: boolean;
+  own?: boolean;
 }) {
+  if (message.isSystem) {
+    return <li className="my-3 text-center"><span className="inline-block rounded-lg border border-amber-200 bg-amber-50/95 px-3 py-1.5 text-xs italic text-slate-600 shadow-sm dark:border-slate-700 dark:bg-slate-800/95 dark:text-slate-300">{maskSensitive(message.text)}</span></li>;
+  }
   return (
-    <li
-      className={`rounded-lg px-3 py-2 text-sm ${
-        highlight
-          ? "border border-brand-300 bg-brand-50 ring-1 ring-brand-300 dark:border-brand-700 dark:bg-brand-900/30"
-          : "border border-transparent"
-      } ${message.isSystem ? "italic text-slate-400 dark:text-slate-500" : ""}`}
-    >
-      <div className="mb-0.5 flex items-center justify-between gap-2">
-        <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
-          {message.sender}
-        </span>
-        <span className="text-[10px] text-slate-400" title={formatDateTime(message.timestamp)}>
-          {formatClock(message.timestamp)}
-        </span>
+    <li className={`flex px-1 ${own ? "justify-end" : "justify-start"}`}>
+      <div className={`chat-message-bubble max-w-[88%] rounded-2xl border px-3.5 py-2.5 text-sm shadow-sm ${own ? "chat-message-own" : "chat-message-other"} ${highlight ? "ring-2 ring-amber-400 ring-offset-1" : ""}`}>
+        <div className="mb-1 flex items-center justify-between gap-5">
+          <span className={`text-xs font-bold ${own ? "text-emerald-800 dark:text-emerald-200" : "text-teal-700 dark:text-teal-200"}`}>{message.sender}</span>
+          <span className="shrink-0 text-[10px] text-slate-500 dark:text-slate-400" title={formatDateTime(message.timestamp)}>{formatClock(message.timestamp)}</span>
+        </div>
+        <p className="whitespace-pre-wrap break-words leading-relaxed text-slate-800 dark:text-slate-100">{maskSensitive(message.text)}</p>
       </div>
-      <p className="whitespace-pre-wrap text-slate-700 dark:text-slate-200">
-        {maskSensitive(message.text)}
-      </p>
     </li>
   );
 }
@@ -108,12 +103,14 @@ export function ChatView({
   highlightId,
   unreadAfterId,
   unreadMode = false,
+  profileName,
 }: {
   messages: Message[];
   windowStart: number;
   highlightId?: string | null;
   unreadAfterId?: string;
   unreadMode?: boolean;
+  profileName?: string;
 }) {
   if (messages.length === 0) {
     return <p className="p-4 text-sm text-slate-500">No messages loaded yet.</p>;
@@ -152,13 +149,13 @@ export function ChatView({
       );
     }
     rows.push(
-      <MessageRow key={message.id} message={message} highlight={message.id === highlightId} />,
+      <MessageRow key={message.id} message={message} highlight={message.id === highlightId} own={!!profileName && message.sender.toLowerCase() === profileName.toLowerCase()} />,
     );
   });
 
   return (
-    <ol className="space-y-1 rounded-xl border border-slate-200 bg-white p-3 dark:border-slate-800 dark:bg-slate-900">
-      {rows}
-    </ol>
+    <div className="chat-wallpaper overflow-hidden rounded-xl border border-[#c9d6ce] p-3 dark:border-slate-700 sm:p-5">
+      <ol className="mx-auto max-w-4xl space-y-2.5">{rows}</ol>
+    </div>
   );
 }

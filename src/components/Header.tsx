@@ -19,7 +19,7 @@ export function Header({
   onOpenEngine,
 }: HeaderProps) {
   return (
-    <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/85 backdrop-blur dark:border-slate-800 dark:bg-slate-950/85">
+    <header className="whatsapp-header sticky top-0 z-30 border-b border-slate-200 bg-white/85 backdrop-blur dark:border-slate-800 dark:bg-slate-950/85">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-2 px-4 py-3 sm:px-6 sm:py-3.5">
         <div className="mr-auto flex items-center gap-2">
           <span
