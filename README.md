@@ -13,7 +13,7 @@ happens on your device. That is not a badge — it is the architecture (see belo
 
 | # | Feature | Where it lives |
 |---|---------|----------------|
-| 1 | Import chats (paste, `.txt` WhatsApp/Telegram export, `.json` Slack export) + **"Load demo chat"** (150+ realistic college project-team messages) | `src/lib/parser.ts`, `src/lib/demoChat.ts` |
+| 1 | Import chats (paste, `.txt` WhatsApp/Telegram export, `.json` Slack export) + **"Load real chat sample"** (43 anonymized messages from a public Ubuntu support conversation) | `src/lib/parser.ts`, `src/lib/demoChat.ts` |
 | 2 | Short **TL;DR** + **topic-wise breakdown** for long/unread conversations | `src/lib/summarize.ts` |
 | 3 | **Key extraction** — decisions, action items (task · owner · deadline), announcements | `src/lib/extract.ts` |
 | 4 | **Explainable priority** High / Medium / Low with a "Why?" tooltip (deadline proximity, urgent words, your mentions/tasks) | `src/lib/priority.ts` |
@@ -73,12 +73,9 @@ Key principles:
 3. **Chunking** (`chunkMessages`) keeps prompts within the model's context window for long chats.
 4. **Everything is testable.** `src/lib/**/*.test.ts` — run with `npm test`.
 
-### Adding the demo / why demo data is not "fake output"
+### Real sample data and attribution
 
-`demoChat.ts` is **input data**, like pasting an export. Every summary, decision, action item,
-priority and mention you see is computed at runtime by the pipeline above. Nothing in the UI is a
-hard-coded result. This is deliberate and important for hackathon evaluation: unplug the demo and
-paste your own WhatsApp export — the same features run on your data.
+`demoChat.ts` contains one real two-person Ubuntu troubleshooting conversation from the [Ubuntu Chat Logs corpus](https://convokit.cornell.edu/documentation/chatlogs.html), conversation 43.15, attributed to Axel Bax / ConvoKit. The corpus contains real Ubuntu support chats and is shared under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Original speaker handles are replaced with role labels and timestamps are shifted relative to now so the catch-up windows work; these changes are disclosed in the import screen. Every summary, action, and priority is computed at runtime; this support chat does not contain group-project deadlines or @mentions. Import your own export to analyze your actual chat.
 
 ---
 
@@ -92,7 +89,7 @@ npm run build      # type-check + production build in dist/
 npm run preview    # preview the production build
 ```
 
-Open the printed `http://localhost:5173`, click **Load demo chat**, pick a catch-up window and
+Open the printed `http://localhost:5173`, click **Load real chat sample**, pick a catch-up window and
 **Analyse chat**.
 
 ### Enabling a real neural model
@@ -127,7 +124,7 @@ src/
   types.ts                     # shared domain types
   lib/
     parser.ts                  # WhatsApp / Telegram / Slack / paste parsing
-    demoChat.ts                # 150+ realistic demo messages (input only)
+    demoChat.ts                # Attributed, anonymized real Ubuntu chat sample
     extract.ts                 # decisions, actions, announcements, mentions, questions
     priority.ts                # explainable High/Medium/Low scoring
     decisionUpdates.ts         # latest-version decisions with history

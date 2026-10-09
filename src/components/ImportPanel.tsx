@@ -29,7 +29,7 @@ export function ImportPanel({ onParse, onDemo, messageCount, warnings }: ImportP
       </h2>
       <p className="mb-3 text-xs text-slate-500 dark:text-slate-400">
         Paste text, upload a WhatsApp/Telegram <code>.txt</code> or Slack <code>.json</code> export,
-        or explore with the demo. Everything stays in your browser.
+        or try a real, public Ubuntu support-chat sample. Everything stays in your browser.
       </p>
 
       <textarea
@@ -72,7 +72,7 @@ export function ImportPanel({ onParse, onDemo, messageCount, warnings }: ImportP
           onClick={onDemo}
           className="rounded-lg border border-brand-300 bg-brand-50 px-3 py-2 text-sm font-medium text-brand-700 hover:bg-brand-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 dark:border-brand-800 dark:bg-brand-900/30 dark:text-brand-200 dark:hover:bg-brand-900/50"
         >
-          Load demo chat
+          Load real chat sample
         </button>
         {messageCount > 0 && (
           <span className="ml-auto text-xs text-slate-500 dark:text-slate-400" role="status">
@@ -80,6 +80,11 @@ export function ImportPanel({ onParse, onDemo, messageCount, warnings }: ImportP
           </span>
         )}
       </div>
+
+      <p className="mt-3 border-t border-slate-100 pt-3 text-xs text-slate-500 dark:border-slate-800 dark:text-slate-400">
+        Sample: Ubuntu Chat Logs, conversation 43.15, attributed to Axel Bax / ConvoKit. Speaker handles are anonymized and timestamps shifted. CC BY 4.0. {" "}
+        <a className="font-medium text-brand-700 underline underline-offset-2 hover:text-brand-900 dark:text-brand-300 dark:hover:text-brand-100" href="https://convokit.cornell.edu/documentation/chatlogs.html" target="_blank" rel="noreferrer">Source &amp; license</a>
+      </p>
 
       {warnings.length > 0 && (
         <ul className="mt-3 space-y-1 text-xs text-amber-700 dark:text-amber-300" role="status">

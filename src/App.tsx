@@ -429,7 +429,7 @@ export default function App() {
                   <div className="mx-auto max-w-xl rounded-2xl border border-white/90 bg-white/90 p-7 text-center shadow-lg dark:border-slate-700 dark:bg-slate-900/95">
                     <span className="mb-3 inline-grid h-14 w-14 place-items-center rounded-full bg-emerald-100 text-2xl text-emerald-700 dark:bg-emerald-950 dark:text-emerald-200" aria-hidden="true">☏</span>
                     <p className="text-lg font-semibold text-slate-800 dark:text-slate-100">Welcome to Gugli AI</p>
-                    <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">Import a chat or load the demo, then summarize unread messages to see what matters.</p>
+                    <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">Import a conversation or load the real sample, then summarize unread messages to see what matters.</p>
                   </div>
                 )}
                 {messages.length > 0 && <div className="home-nudge"><div><span className="eyebrow">YOUR CHAT, CAUGHT UP</span><h3>Good to see you, {profile.name}.</h3><p>Your messages stay on this device. Pick a time window, then get straight to what matters.</p></div><button type="button" onClick={() => setActiveTab("summary")}>View your summary <span aria-hidden="true">→</span></button></div>}
@@ -473,8 +473,8 @@ export default function App() {
       </main>
 
       <footer className="mx-auto max-w-5xl px-4 py-6 text-center text-[11px] text-slate-400">
-        Gugli AI · local-first · no conversations leave this device · demo data released under CC0 ·
-        click through every tab with your own exported chat, not just the demo.
+        Gugli AI · local-first · no conversations leave this device · real sample attributed to Cornell ConvoKit ·
+        try the app with your own exported chat, not just the sample.
       </footer>
 
       {engineOpen && (

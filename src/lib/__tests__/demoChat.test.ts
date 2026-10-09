@@ -1,45 +1,29 @@
 import { describe, expect, it } from "vitest";
 import { buildDemoChat } from "../demoChat";
-import { extractItems } from "../extract";
-import type { UserProfile } from "../../types";
-
-const PROFILE: UserProfile = {
-  name: "Aarav",
-  handle: "aarav",
-  tasks: ["ML model", "slides", "demo video"],
-};
 
 describe("buildDemoChat", () => {
   const messages = buildDemoChat();
 
-  it("contains 150+ messages", () => {
-    expect(messages.length).toBeGreaterThanOrEqual(150);
+  it("contains the 43-message real Ubuntu support sample", () => {
+    expect(messages).toHaveLength(43);
+    expect(messages[0].text).toBe("So I ran into a wifi pickle");
+    expect(messages[messages.length - 1].text).toBe("got it to work, thanks");
   });
 
-  it("is realistic and dated in the past", () => {
+  it("shifts original timestamps into the recent catch-up window", () => {
     const now = Date.now();
     expect(messages.every((m) => m.timestamp <= now)).toBe(true);
-    expect(messages.some((m) => m.text.includes("end-to-end encrypted"))).toBe(true);
+    expect(now - messages[0].timestamp).toBeGreaterThan(53 * 60_000);
+    expect(now - messages[0].timestamp).toBeLessThan(55 * 60_000);
   });
 
-  it("contains @mentions of the demo user", () => {
-    const withMentions = messages.filter((m) => m.mentions.includes("aarav"));
-    expect(withMentions.length).toBeGreaterThan(5);
+  it("uses anonymized role labels instead of source IRC handles", () => {
+    expect(new Set(messages.map((m) => m.sender))).toEqual(new Set(["Requester", "Helper"]));
+    expect(messages.some((m) => m.text.includes("frecel") || m.text.includes("TJ-"))).toBe(false);
   });
 
-  it("contains deadlines, decisions, questions and noise", () => {
-    const all = messages.map((m) => m.text.toLowerCase()).join(" ");
-    expect(all).toMatch(/deadline|due|tomorrow/);
-    expect(all).toMatch(/decision|decided/);
-    expect(all).toMatch(/\?/);
-    expect(all).toMatch(/\blol\b|\bok\b|\bgn\b/);
-  });
-
-  it("extracts a non-trivial set of items from the demo alone", () => {
-    const result = extractItems(messages, PROFILE);
-    expect(result.actions.length).toBeGreaterThan(3);
-    expect(result.decisions.length).toBeGreaterThan(3);
-    expect(result.mentions.length).toBeGreaterThan(3);
-    expect(result.announcements.length).toBeGreaterThan(1);
+  it("preserves the real troubleshooting conversation text", () => {
+    expect(messages.some((m) => m.text.includes("0bda:5875"))).toBe(true);
+    expect(messages.some((m) => m.text.includes("thanks for your help"))).toBe(true);
   });
 });

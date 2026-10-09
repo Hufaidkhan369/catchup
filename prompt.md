@@ -11,7 +11,7 @@ Build and improve **Gugli AI**, a local-first web app that helps people catch up
 
 ## Core capabilities
 
-- Import exported WhatsApp or Telegram text chats and Slack JSON exports, or paste chat text; include a clearly labeled demo chat.
+- Import exported WhatsApp or Telegram text chats and Slack JSON exports, or paste chat text; include a clearly labeled, attributed public chat sample.
 - Parse senders, timestamps, messages, and system events.
 - Summarize recent or unread messages with a concise overview and topic breakdown. Chat exports do not include read receipts, so let the user choose the last message they read and treat subsequent messages as unread.
 - Identify important messages, explain their High / Medium / Low priority, and extract decisions, announcements, action items, direct mentions, and questions.
